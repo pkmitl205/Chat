@@ -7,14 +7,6 @@ var mongo_client = require('mongodb').MongoClient;
 // Port
 var port = 3000;
 
-// Mongo Connect
-var url = 'mongodb://localhost:27017/chat_io';
-
-app.use(express.static('public'));
-
-users = [];
-connections = [];
-
 server.listen(process.env.PORT || port);
 console.log('Server running on Port: ' + port)
 
@@ -22,8 +14,11 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html')
 });
 
+// Mongo Connect
+var url = 'mongodb://localhost:27017/chat_io';
 
-mongo_client.connect(url, function(err, db){
+mongo_client.connect(process.env.MONGODB_URI || url, function(err, db){
+    
     var message_collection = db.collection('message');
 
     io.sockets.on('connection', function(socket){
@@ -63,6 +58,7 @@ mongo_client.connect(url, function(err, db){
             updateUsernames();
         });
         
+        // Function Update Username
         function updateUsernames(){
             io.sockets.emit('get users', users);
         }
